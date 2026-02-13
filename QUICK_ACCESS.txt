@@ -1,0 +1,47 @@
+╔══════════════════════════════════════════════════════════════════╗
+║     Green Academic Compliance System - Network Access URLs      ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📱 ACCESS FROM ANY DEVICE ON YOUR NETWORK:
+
+Frontend (Main App):
+🌐 http://10.147.20.249:5173
+
+Backend API:
+🔧 http://10.147.20.249:5001
+
+
+💻 ACCESS FROM THIS COMPUTER (Localhost):
+
+Frontend:
+🏠 http://localhost:5173
+
+Backend:
+🏠 http://localhost:5001
+
+
+⚠️  IMPORTANT - RESTART REQUIRED:
+
+The backend configuration has been updated. You need to restart the servers:
+
+1. Stop current servers: Press Ctrl+C in the terminal running "npm run dev"
+2. Restart: npm run dev
+3. Look for the new network access messages in the backend output
+
+
+🔥 FIREWALL SETUP (If needed):
+
+If other devices can't connect, run these commands as Administrator:
+
+New-NetFirewallRule -DisplayName "Vite Dev Server" -Direction Inbound -LocalPort 5173 -Protocol TCP -Action Allow
+New-NetFirewallRule -DisplayName "Express Backend" -Direction Inbound -LocalPort 5001 -Protocol TCP -Action Allow
+
+
+📝 TESTING FROM ANOTHER DEVICE:
+
+1. Connect your phone/tablet to the same WiFi network
+2. Open browser and go to: http://10.147.20.249:5173
+3. Register, login, and create reports - it should work perfectly!
+
+
+For detailed instructions, see: NETWORK_ACCESS.md

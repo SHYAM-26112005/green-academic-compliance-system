@@ -1,19 +1,27 @@
-import { Home, ClipboardCheck, FileText, Menu, X, Server } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { Home, ClipboardCheck, FileText, Menu, X, LogOut } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import clsx from 'clsx';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const { token, logout } = useAuth();
+    const navigate = useNavigate();
 
     const navItems = [
         { name: 'Dashboard', icon: Home, path: '/' },
         { name: 'Compliance', icon: ClipboardCheck, path: '/compliance' },
         { name: 'Reports', icon: FileText, path: '/reports' },
-        { name: 'API Demo', icon: Server, path: '/auth-demo' },
     ];
 
     const toggleSidebar = () => setIsOpen(!isOpen);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+        setIsOpen(false);
+    };
 
     return (
         <>
@@ -57,8 +65,20 @@ const Sidebar = () => {
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-green-800">
-                    <p className="text-sm text-green-300 text-center">&copy; 2026 GreenComp</p>
+                <div className="p-4 border-t border-green-800 space-y-4">
+                    <div className="text-center">
+                        <p className="text-sm text-green-300">&copy; 2026 GreenComp</p>
+                    </div>
+
+                    {token && (
+                        <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center justify-center px-4 py-2 bg-red-600/20 text-red-100 border border-red-500/50 rounded-lg hover:bg-red-600/30 transition-all text-sm font-medium"
+                        >
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Sign Out
+                        </button>
+                    )}
                 </div>
             </aside>
 

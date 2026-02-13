@@ -3,7 +3,8 @@ import { Plus, X } from 'lucide-react';
 import clsx from 'clsx';
 
 interface Report {
-    id: number;
+    _id?: string;
+    id?: number; // Keep for compatibility if needed, but we'll use _id mostly
     department: string;
     category: 'Energy' | 'Water' | 'Waste' | 'Carbon';
     description: string;
@@ -34,10 +35,16 @@ const ComplianceReport = () => {
         date: new Date().toISOString().split('T')[0]
     });
 
+    const API_URL = '/api/reports';
+
+    useEffect(() => {
+        fetchReports();
+    }, []);
+
     const fetchReports = async () => {
-        setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/reports');
+            setLoading(true);
+            const response = await fetch(API_URL);
             if (!response.ok) throw new Error('Failed to fetch reports');
             const data = await response.json();
             setReports(data);
@@ -47,10 +54,6 @@ const ComplianceReport = () => {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetchReports();
-    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -63,17 +66,32 @@ const ComplianceReport = () => {
         setSuccess('');
         setLoading(true);
 
+        const newReport = {
+            department: formData.department,
+            category: formData.category,
+            description: formData.description,
+            score: Number(formData.score),
+            status: formData.status,
+            date: formData.date
+        };
+
         try {
-            const response = await fetch('http://localhost:5000/reports', {
+            const response = await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newReport),
             });
 
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'Failed to submit report');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to submit report');
+            }
 
-            setSuccess('Report submitted successfully!');
+            const savedReport = await response.json();
+            setReports(prev => [savedReport, ...prev]);
+            setSuccess('Report successfully saved to database!');
             setShowModal(false);
             setFormData({
                 department: '',
@@ -83,12 +101,12 @@ const ComplianceReport = () => {
                 status: 'Compliant',
                 date: new Date().toISOString().split('T')[0]
             });
-            fetchReports();
+
+            setTimeout(() => setSuccess(''), 3000);
         } catch (err: any) {
             setError(err.message);
         } finally {
             setLoading(false);
-            setTimeout(() => setSuccess(''), 3000);
         }
     };
 
@@ -123,11 +141,13 @@ const ComplianceReport = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {reports.length === 0 ? (
-                                <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">No reports found.</td></tr>
+                            {loading && reports.length === 0 ? (
+                                <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">Loading reports...</td></tr>
+                            ) : reports.length === 0 ? (
+                                <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">No reports found in database.</td></tr>
                             ) : (
                                 reports.map((report) => (
-                                    <tr key={report.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={report._id || report.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 font-medium text-gray-900">{report.department}</td>
                                         <td className="px-6 py-4 text-gray-600">{report.category}</td>
                                         <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{report.description}</td>
@@ -152,7 +172,7 @@ const ComplianceReport = () => {
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-green-50/50">
                             <h2 className="text-xl font-bold text-green-900">New Compliance Report</h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
+                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600" disabled={loading}>
                                 <X size={24} />
                             </button>
                         </div>
@@ -240,6 +260,7 @@ const ComplianceReport = () => {
                                     type="button"
                                     onClick={() => setShowModal(false)}
                                     className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                    disabled={loading}
                                 >
                                     Cancel
                                 </button>
