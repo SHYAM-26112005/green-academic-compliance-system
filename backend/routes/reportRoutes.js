@@ -34,4 +34,18 @@ router.post('/', async (req, res) => {
     }
 });
 
+// DELETE a report
+router.delete('/:id', async (req, res) => {
+    try {
+        const deletedReport = await Report.findByIdAndDelete(req.params.id);
+        if (!deletedReport) {
+            return res.status(404).json({ message: 'Report not found' });
+        }
+        return res.status(200).json({ message: 'Report deleted successfully' });
+    } catch (error) {
+        console.error('Delete error:', error);
+        return res.status(500).json({ message: 'Error deleting report', error: error.message });
+    }
+});
+
 export default router;

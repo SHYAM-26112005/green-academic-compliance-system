@@ -1,0 +1,1 @@
+[[{"name":"ac-olg5pqa-shard-00-01.zxjoyrr.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"},{"name":"ac-olg5pqa-shard-00-02.zxjoyrr.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"},{"name":"ac-olg5pqa-shard-00-00.zxjoyrr.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"}],[["authSource=admin&replicaSet=atlas-244ee6-shard-0"]]]

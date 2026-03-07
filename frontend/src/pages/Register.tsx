@@ -22,6 +22,12 @@ const Register: React.FC = () => {
                 body: JSON.stringify({ name, email, password }),
             });
 
+            // Check if response has content before parsing
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server error: Unable to connect to backend. Please ensure the backend server is running.');
+            }
+
             const data = await response.json();
 
             if (!response.ok) {
@@ -30,7 +36,11 @@ const Register: React.FC = () => {
 
             navigate('/login', { state: { message: 'Registration successful! Please login.' } });
         } catch (err: any) {
-            setError(err.message || 'An error occurred during registration.');
+            if (err.name === 'TypeError' && err.message.includes('fetch')) {
+                setError('Cannot connect to server. Please ensure the backend is running on port 5001.');
+            } else {
+                setError(err.message || 'An error occurred during registration.');
+            }
         } finally {
             setLoading(false);
         }

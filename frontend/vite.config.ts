@@ -8,9 +8,18 @@ export default defineConfig({
   server: {
     host: true,
     proxy: {
-      '/login': 'http://localhost:5001',
-      '/register': 'http://localhost:5001',
-      '/api': 'http://localhost:5001',
+      '/login': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/register': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
     }
   }
 })

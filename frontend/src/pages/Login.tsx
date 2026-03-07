@@ -32,6 +32,12 @@ const Login: React.FC = () => {
         body: JSON.stringify({ email, password }),
       });
 
+      // Check if response has content before parsing
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server error: Unable to connect to backend. Please ensure the backend server is running.');
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
@@ -43,7 +49,11 @@ const Login: React.FC = () => {
 
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'An error occurred during login.');
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setError('Cannot connect to server. Please ensure the backend is running on port 5001.');
+      } else {
+        setError(err.message || 'An error occurred during login.');
+      }
     } finally {
       setLoading(false);
     }

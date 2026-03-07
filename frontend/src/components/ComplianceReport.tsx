@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
 
 interface Report {
@@ -35,7 +35,7 @@ const ComplianceReport = () => {
         date: new Date().toISOString().split('T')[0]
     });
 
-    const API_URL = '/api/reports';
+    const API_URL = 'http://localhost:5000/api/reports';
 
     useEffect(() => {
         fetchReports();
@@ -45,6 +45,13 @@ const ComplianceReport = () => {
         try {
             setLoading(true);
             const response = await fetch(API_URL);
+
+            // Safe JSON parsing: check content-type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server returned non-JSON response. Please check if the backend is running correctly.');
+            }
+
             if (!response.ok) throw new Error('Failed to fetch reports');
             const data = await response.json();
             setReports(data);
@@ -110,6 +117,47 @@ const ComplianceReport = () => {
         }
     };
 
+    const handleDelete = async (id: string) => {
+        if (!window.confirm('Are you sure you want to delete this report?')) return;
+
+        try {
+            setLoading(true);
+            setError('');
+            setSuccess('');
+
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+            });
+
+            // Safe JSON parsing check
+            const contentType = response.headers.get('content-type');
+            let data: any = {};
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to delete report');
+            }
+
+            // Immediately update UI
+            setReports(prev => prev.filter(report => report._id !== id));
+            setSuccess(data.message || 'Report deleted successfully');
+
+            // Optionally refresh the whole list to sync with server
+            setTimeout(() => {
+                setSuccess('');
+                fetchReports();
+            }, 3000);
+        } catch (err: any) {
+            setError(err.message);
+            // Re-fetch to ensure UI is in sync if delete failed
+            fetchReports();
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-green-100 overflow-hidden">
@@ -138,6 +186,7 @@ const ComplianceReport = () => {
                                 <th className="px-6 py-4 font-medium">Score</th>
                                 <th className="px-6 py-4 font-medium">Status</th>
                                 <th className="px-6 py-4 font-medium">Date</th>
+                                <th className="px-6 py-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -158,6 +207,16 @@ const ComplianceReport = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-gray-500 text-sm">{report.date}</td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button
+                                                onClick={() => report._id && handleDelete(report._id)}
+                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                title="Delete Report"
+                                                disabled={loading}
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))
                             )}
