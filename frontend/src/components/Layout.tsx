@@ -3,7 +3,7 @@ import Sidebar from './Sidebar';
 
 const Layout = () => {
     return (
-        <div className="flex min-h-screen bg-gray-50 text-gray-900 font-sans">
+        <div className="flex min-h-screen bg-green-100 text-gray-900 font-sans">
             <Sidebar />
 
             {/* Main Content Area */}

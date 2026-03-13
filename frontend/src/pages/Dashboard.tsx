@@ -19,14 +19,14 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const API_BASE_URL = 'http://localhost:5000/api';
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
     const fetchReports = async () => {
         setLoading(true);
         setError(null);
         try {
             // Check if backend is running first
-            const isBackendUp = await fetch('http://localhost:5000/ping')
+            const isBackendUp = await fetch(`${API_BASE_URL.replace('/api', '')}/ping`)
                 .then(res => res.ok)
                 .catch(() => false);
 

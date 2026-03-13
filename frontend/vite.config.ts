@@ -9,15 +9,19 @@ export default defineConfig({
     host: true,
     proxy: {
       '/login': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
       },
       '/register': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+      },
+      '/google-login': {
+        target: 'http://localhost:5001',
         changeOrigin: true,
       },
     }

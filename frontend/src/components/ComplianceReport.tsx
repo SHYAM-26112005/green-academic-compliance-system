@@ -35,7 +35,7 @@ const ComplianceReport = () => {
         date: new Date().toISOString().split('T')[0]
     });
 
-    const API_URL = 'http://localhost:5000/api/reports';
+    const API_URL = '/api/reports';
 
     useEffect(() => {
         fetchReports();
