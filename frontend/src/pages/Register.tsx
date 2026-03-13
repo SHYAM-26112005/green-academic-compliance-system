@@ -10,6 +10,7 @@ const Register: React.FC = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,7 +25,7 @@ const Register: React.FC = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('/register', {
+            const response = await fetch(`${API_BASE_URL}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password }),
