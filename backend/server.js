@@ -6,6 +6,11 @@ import authRoutes from './routes/authRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import generatedReportRoutes from './routes/generatedReportRoutes.js';
 import { authenticateToken } from './middleware/auth.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -47,7 +52,18 @@ mongoose.connect(process.env.MONGO_URI)
         console.error("MongoDB Connection Error:", error);
     });
 
+// Serve static files from the React app
+const frontendPath = path.resolve(__dirname, '../frontend/dist');
+app.use(express.static(frontendPath));
+
 // Routes
+app.get("/", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "Green Academic Compliance Backend is running"
+  });
+});
+
 app.use('/', authRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/generated-reports', generatedReportRoutes);
@@ -58,6 +74,17 @@ app.get('/api/protected', authenticateToken, (req, res) => {
         message: 'Success! You have accessed a protected route.',
         user: req.user
     });
+});
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.use((req, res, next) => {
+    // Avoid interfering with API routes
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/ping')) {
+        res.sendFile(path.resolve(frontendPath, 'index.html'));
+    } else {
+        next();
+    }
 });
 
 // Start Server
