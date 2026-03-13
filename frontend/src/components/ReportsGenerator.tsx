@@ -42,9 +42,9 @@ const ReportsGenerator = () => {
     const [typeFilter, setTypeFilter] = useState('All Formats');
     const [categoryFilter, setCategoryFilter] = useState('All Types');
 
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-    const API_URL = `${API_BASE_URL}/api/generated-reports`;
-    const COMPLIANCE_API = `${API_BASE_URL}/api/reports`;
+    const API = import.meta.env.VITE_API_BASE_URL;
+    const API_URL = `${API}/api/generated-reports`;
+    const COMPLIANCE_API = `${API}/api/reports`;
 
     useEffect(() => {
         fetchReports();

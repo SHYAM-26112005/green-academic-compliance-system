@@ -18,7 +18,7 @@ const getClientId = () => {
 };
 
 const clientId = getClientId();
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''; // Empty string means use relative path
+const API = import.meta.env.VITE_API_BASE_URL;
 
 
 const Login: React.FC = () => {
@@ -52,7 +52,7 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const response = await fetch(`${API}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -92,7 +92,7 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/reset-password`, {
+      const response = await fetch(`${API}/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, newPassword }),
@@ -120,7 +120,7 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/google-login`, {
+      const response = await fetch(`${API}/google-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential }),

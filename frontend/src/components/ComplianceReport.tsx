@@ -35,8 +35,8 @@ const ComplianceReport = () => {
         date: new Date().toISOString().split('T')[0]
     });
 
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-    const API_URL = `${API_BASE_URL}/api/reports`;
+    const API = import.meta.env.VITE_API_BASE_URL;
+    const API_URL = `${API}/api/reports`;
 
     useEffect(() => {
         fetchReports();

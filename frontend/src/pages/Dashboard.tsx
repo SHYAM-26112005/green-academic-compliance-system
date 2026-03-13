@@ -20,15 +20,15 @@ const Dashboard = () => {
     const [error, setError] = useState<string | null>(null);
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-    const API_URL = `${API_BASE_URL}/api/reports`;
+    const API = import.meta.env.VITE_API_BASE_URL;
+    const API_URL = `${API}/api/reports`;
 
     const fetchReports = async () => {
         setLoading(true);
         setError(null);
         try {
             // Check if backend is running first
-            const pingURL = `${API_BASE_URL}/ping`;
+            const pingURL = `${API}/ping`;
             const isBackendUp = await fetch(pingURL)
                 .then(res => res.ok)
                 .catch(() => false);
