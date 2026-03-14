@@ -146,13 +146,6 @@ const Dashboard = () => {
                         Live compliance monitoring
                     </p>
                 </div>
-                <button
-                    onClick={fetchReports}
-                    className="absolute right-0 p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400"
-                    title="Refresh Data"
-                >
-                    <RefreshCw className="w-5 h-5" />
-                </button>
             </header>
 
             {/* Stats Grid */}
