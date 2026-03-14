@@ -138,17 +138,17 @@ const Dashboard = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
+            <header className="relative flex items-center justify-center w-full py-2">
+                <div className="flex flex-col items-center text-center">
                     <h1 className="text-4xl font-black text-green-950 tracking-tight">System Dashboard</h1>
-                    <p className="text-gray-500 mt-1 flex items-center gap-2">
+                    <p className="text-gray-500 mt-2 flex items-center justify-center gap-2">
                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                         Live compliance monitoring
                     </p>
                 </div>
                 <button
                     onClick={fetchReports}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400"
+                    className="absolute right-0 p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400"
                     title="Refresh Data"
                 >
                     <RefreshCw className="w-5 h-5" />

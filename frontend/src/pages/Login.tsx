@@ -3,8 +3,6 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-
-// 1. Go to Google Cloud Console (https://console.cloud.google.com/)
 // 2. Create/Select a project and go to APIs & Services > Credentials
 // 3. Create an OAuth 2.0 Client ID for a "Web application"
 // 4. IMPORTANT: Add Authorized JavaScript Origin: http://localhost:5175
@@ -303,7 +301,8 @@ const Login: React.FC = () => {
                     console.log("Login Failed");
                     setError('Google sign-in was unsuccessful.');
                   }}
-                  useOneTap
+                  // @ts-ignore: prompt is supported by Google API but missing in the type definitions
+                  prompt="select_account"
                   theme="outline"
                   size="large"
                   width="100%"

@@ -131,7 +131,7 @@ router.post('/google-login', async (req, res) => {
         const token = jwt.sign(
             { id: user._id, name: user.name, email: user.email, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: '1d' }
+            { expiresIn: '1h' }
         );
 
         res.json({
@@ -177,6 +177,34 @@ router.post('/reset-password', async (req, res) => {
     } catch (error) {
         console.error('Reset password error:', error);
         res.status(500).json({ error: 'Internal server error during password reset.' });
+    }
+});
+
+/**
+ * @route   DELETE /remove-google-account
+ * @desc    Remove Google ID from user account
+ */
+router.delete('/remove-google-account', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email is required to remove Google account link.' });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        user.googleId = undefined;
+        await user.save();
+
+        res.json({ message: 'Google account link removed successfully.' });
+    } catch (error) {
+        console.error('Remove Google account error:', error);
+        res.status(500).json({ error: 'Internal server error during account update.' });
     }
 });
 

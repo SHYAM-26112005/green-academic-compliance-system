@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { googleLogout } from '@react-oauth/google';
 
 interface User {
     id: string;
@@ -22,22 +23,62 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        // Initialize state from localStorage on app load
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+    const logout = () => {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('loginTimestamp');
+        
+        try {
+            googleLogout();
+            if ((window as any).google?.accounts?.id?.disableAutoSelect) {
+                (window as any).google.accounts.id.disableAutoSelect();
+            }
+        } catch (error) {
+            console.error("Error clearing Google session:", error);
+        }
+    };
 
-        if (storedToken && storedUser) {
+    const checkSessionExpiration = () => {
+        const timestampStr = localStorage.getItem('loginTimestamp');
+        if (timestampStr) {
+            const loginTime = parseInt(timestampStr, 10);
+            const currentTime = Date.now();
+            const ONE_HOUR_MS = 60 * 60 * 1000;
+
+            if (currentTime - loginTime > ONE_HOUR_MS) {
+                console.log("Session expired. Logging out automatically.");
+                logout();
+                // We use window.location here since we aren't inside a Router strictly in context,
+                // or we let the protected routes handle the redirect when user goes null.
+                window.location.href = '/login';
+            }
+        }
+    };
+
+    useEffect(() => {
+        // Before setting state, check if the session is already expired
+        checkSessionExpiration();
+
+        // If the checking didn't trigger a logout (meaning token is still there)
+        const storedUser = localStorage.getItem('user');
+        
+        if (localStorage.getItem('token') && storedUser) {
             try {
-                setToken(storedToken);
+                setToken(localStorage.getItem('token'));
                 setUser(JSON.parse(storedUser));
             } catch (error) {
                 console.error('Failed to parse stored user:', error);
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                logout();
             }
         }
+        
         setLoading(false);
+
+        // Periodically check expiration every 1 minute while the app is open
+        const intervalId = setInterval(checkSessionExpiration, 60 * 1000);
+        return () => clearInterval(intervalId);
     }, []);
 
     const login = (newToken: string, newUser: User) => {
@@ -45,13 +86,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(newUser);
         localStorage.setItem('token', newToken);
         localStorage.setItem('user', JSON.stringify(newUser));
-    };
-
-    const logout = () => {
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.setItem('loginTimestamp', Date.now().toString());
     };
 
     return (

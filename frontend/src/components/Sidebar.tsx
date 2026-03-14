@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import clsx from 'clsx';
 import { useAuth } from '../context/AuthContext';
+import { Trash2 } from 'lucide-react';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -21,6 +22,42 @@ const Sidebar = () => {
         logout();
         navigate('/login');
         setIsOpen(false);
+    };
+
+    const handleUnlinkGoogleAccount = async () => {
+        if (!window.confirm("Are you sure you want to unlink your Google account? Your data will remain intact, but you will need to log in with an email and password from now on.")) {
+            return;
+        }
+        
+        try {
+            const userStr = localStorage.getItem('user');
+            
+            if (!userStr) {
+                alert("User session not found. Please log in again.");
+                return;
+            }
+            
+            const user = JSON.parse(userStr);
+            
+            const response = await fetch(`/remove-google-account`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user.email }),
+            });
+            
+            if (response.ok) {
+                alert("Google account successfully unlinked!\\n\\nNOTE: If you originally created this account using Google Sign-In, please click 'Forgot Password?' on the login screen to set up a new password for your email address.");
+                logout();
+                navigate('/login');
+                setIsOpen(false);
+            } else {
+                const data = await response.json();
+                alert(data.error || "Failed to unlink Google account.");
+            }
+        } catch (error) {
+            console.error("Error unlinking account:", error);
+            alert("An error occurred while unlinking your account.");
+        }
     };
 
     return (
@@ -71,13 +108,22 @@ const Sidebar = () => {
                     </div>
 
                     {token && (
-                        <button
-                            onClick={handleLogout}
-                            className="w-full flex items-center justify-center px-4 py-2 bg-red-600/20 text-red-100 border border-red-500/50 rounded-lg hover:bg-red-600/30 transition-all text-sm font-medium"
-                        >
-                            <LogOut className="w-4 h-4 mr-2" />
-                            Sign Out
-                        </button>
+                        <div className="space-y-2">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center justify-center px-4 py-2 bg-red-600/20 text-red-100 border border-red-500/50 rounded-lg hover:bg-red-600/30 transition-all text-sm font-medium"
+                            >
+                                <LogOut className="w-4 h-4 mr-2" />
+                                Sign Out
+                            </button>
+                            <button
+                                onClick={handleUnlinkGoogleAccount}
+                                className="w-full flex items-center justify-center px-4 py-2 bg-red-600 text-white border border-red-700 rounded-lg hover:bg-red-700 transition-all text-xs font-medium"
+                            >
+                                <Trash2 className="w-3 h-3 mr-2" />
+                                Delete Account
+                            </button>
+                        </div>
                     )}
                 </div>
             </aside>
