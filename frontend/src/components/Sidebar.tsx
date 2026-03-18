@@ -39,7 +39,8 @@ const Sidebar = () => {
             
             const user = JSON.parse(userStr);
             
-            const response = await fetch(`/remove-google-account`, {
+            const API = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API}/remove-google-account`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user.email }),
